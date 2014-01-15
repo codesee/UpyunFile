@@ -5,7 +5,7 @@ UpyunFile
 
 ####插件简介：
 
-  基于Typecho原文件上传接口开发，继承原上传所有（上传、修改和删除）功能，有效分流网站流量，减轻系统负载。[更多](http://pengzhiyong.com/blog/192.html "UpyunFile详情介绍")
+  基于Typecho原文件上传接口开发，继承原上传所有（上传、修改和删除）功能，有效分流网站流量，减轻系统负载。([更多...](http://pengzhiyong.com/blog/192.html "UpyunFile详情介绍"))
   
 ####插件功能：
 
