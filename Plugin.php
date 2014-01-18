@@ -4,7 +4,7 @@
  * 
  * @package UpyunFile
  * @author codesee
- * @version 0.5.1
+ * @version 0.6.0
  * @link http://pengzhiyong.com
  * @date 2014-01-15
  */
