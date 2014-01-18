@@ -53,6 +53,14 @@ class UpyunFile_Plugin implements Typecho_Plugin_Interface
 		$form->addInput($upyundomain->addRule('required',_t('您必须填写绑定域名，它是由Upyun提供'))
 		->addRule('url', _t('您输入的域名格式错误')));
 		
+		$upyunpathmode = new Typecho_Widget_Helper_Form_Element_Radio(
+            'mode',
+            array('typecho' => _t('Typecho结构(/usr/uploads/年/月/文件名)'),'simple' => _t('精简结构(/年/月/文件名)')),
+            'typecho',
+            _t('目录结构模式'),
+            _t('默认为Typecho结构模式')
+        );
+		
         $upyunhost = new Typecho_Widget_Helper_Form_Element_Text('upyunhost', NULL, NULL, _t('空间名：'));
 		$upyunhost->input->setAttribute('class','mini');
 		$form->addInput($upyunhost->addRule('required',_t('您必须填写空间名，它是由Upyun提供')));
@@ -107,6 +115,11 @@ class UpyunFile_Plugin implements Typecho_Plugin_Interface
 		
         //构建路径 /year/month/
         $path = '/' . $date->year . '/' . $date->month;
+        $settings = $options->plugin('UpyunFile');
+		
+		if($settings->mode == 'typecho'){
+			$path = '/usr/uploads' . $$path;
+		}
 		
         //获取文件名及文件路径
         $fileName = sprintf('%u', crc32(uniqid())) . '.' . $ext;
