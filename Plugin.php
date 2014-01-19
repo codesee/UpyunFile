@@ -49,7 +49,7 @@ class UpyunFile_Plugin implements Typecho_Plugin_Interface
      */
     public static function config(Typecho_Widget_Helper_Form $form)
     {
-		$upyundomain = new Typecho_Widget_Helper_Form_Element_Text('upyundomain', NULL, 'http://', _t('绑定域名：'), _t('注意以http://开头，最后不要加/'));
+		$upyundomain = new Typecho_Widget_Helper_Form_Element_Text('upyundomain', NULL, 'http://', _t('绑定域名：'), _t('该绑定域名为绑定Upyun空间的域名，由Upyun提供，注意以http://开头，最后不要加/'));
 		$form->addInput($upyundomain->addRule('required',_t('您必须填写绑定域名，它是由Upyun提供'))
 		->addRule('url', _t('您输入的域名格式错误')));
 		
