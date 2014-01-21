@@ -118,7 +118,7 @@ class UpyunFile_Plugin implements Typecho_Plugin_Interface
         $settings = $options->plugin('UpyunFile');
 		
 		if($settings->mode == 'typecho'){
-			$path = '/usr/uploads' . $$path;
+			$path = '/usr/uploads' . $path;
 		}
 		
         //获取文件名及文件路径
