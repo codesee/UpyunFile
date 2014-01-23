@@ -60,7 +60,8 @@ class UpyunFile_Plugin implements Typecho_Plugin_Interface
             _t('目录结构模式'),
             _t('默认为Typecho结构模式')
         );
-		
+        $form->addInput($upyunpathmode);
+             
         $upyunhost = new Typecho_Widget_Helper_Form_Element_Text('upyunhost', NULL, NULL, _t('空间名：'));
 		$upyunhost->input->setAttribute('class','mini');
 		$form->addInput($upyunhost->addRule('required',_t('您必须填写空间名，它是由Upyun提供')));
@@ -71,7 +72,7 @@ class UpyunFile_Plugin implements Typecho_Plugin_Interface
 
         $upyunpwd = new Typecho_Widget_Helper_Form_Element_Password('upyunpwd', NULL, NULL, _t('密码：'));
 		$form->addInput($upyunpwd->addRule('required',_t('您必须填写密码，它是由Upyun提供'))
-		->addRule(array('UpyunFile_Plugin', 'validate'), _t('验证不通过')));
+		->addRule(array('UpyunFile_Plugin', 'validate'), _t('验证不通过，请核对Upyun操作员和密码是否输入正确')));
     }
     
     /**
