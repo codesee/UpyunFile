@@ -34,4 +34,4 @@ UpyunFile
 
   1. 作者：codesee 
   2. 网址：<http://pengzhiyong.com>
-  3. 邮箱：codesee(###)gmail.com
+  3. 邮箱：pengzhiyong(###)live.com
