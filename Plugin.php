@@ -1,6 +1,6 @@
 <?php
 /**
- * 又拍云文件管理
+ * 又拍云（UpYun）文件管理
  * 
  * @package UpyunFile
  * @author codesee
