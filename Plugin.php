@@ -1,16 +1,19 @@
 <?php
 /**
- * Typecho又拍云文件管理
+ * 又拍云文件管理
  * 
  * @package UpyunFile
  * @author codesee
- * @version 0.6.0
+ * @version 0.7.0
  * @link http://pengzhiyong.com
- * @date 2014-01-15
+ * @date 2015-12-23
  */
 
 class UpyunFile_Plugin implements Typecho_Plugin_Interface
 {
+	//上传文件目录
+	const UPLOAD_DIR = '/usr/uploads' ;
+	
     /**
      * 激活插件方法,如果激活失败,直接抛出异常
      * 
@@ -49,22 +52,23 @@ class UpyunFile_Plugin implements Typecho_Plugin_Interface
      */
     public static function config(Typecho_Widget_Helper_Form $form)
     {
-		$upyundomain = new Typecho_Widget_Helper_Form_Element_Text('upyundomain', NULL, 'http://', _t('绑定域名：'), _t('该绑定域名为绑定Upyun空间的域名，由Upyun提供，注意以http://开头，最后不要加/'));
+		$upyundomain = new Typecho_Widget_Helper_Form_Element_Text('upyundomain', NULL, 'http://', _t('绑定域名：'), _t('该绑定域名为绑定Upyun服务的域名，由Upyun提供，注意以http://开头，最后不要加/'));
 		$form->addInput($upyundomain->addRule('required',_t('您必须填写绑定域名，它是由Upyun提供'))
 		->addRule('url', _t('您输入的域名格式错误')));
 		
 		$upyunpathmode = new Typecho_Widget_Helper_Form_Element_Radio(
             'mode',
-            array('typecho' => _t('Typecho结构(/usr/uploads/年/月/文件名)'),'simple' => _t('精简结构(/年/月/文件名)')),
+            array('typecho' => _t('Typecho结构(' . self::getUploadDir() . '/年/月/文件名)'),'simple' => _t('精简结构(/年/月/文件名)')),
             'typecho',
             _t('目录结构模式'),
             _t('默认为Typecho结构模式')
         );
-        $form->addInput($upyunpathmode);
-             
-        $upyunhost = new Typecho_Widget_Helper_Form_Element_Text('upyunhost', NULL, NULL, _t('空间名：'));
+		
+		$form->addInput($upyunpathmode);
+		
+        $upyunhost = new Typecho_Widget_Helper_Form_Element_Text('upyunhost', NULL, NULL, _t('服务名称：'));
 		$upyunhost->input->setAttribute('class','mini');
-		$form->addInput($upyunhost->addRule('required',_t('您必须填写空间名，它是由Upyun提供')));
+		$form->addInput($upyunhost->addRule('required',_t('您必须填写服务名称，它是由Upyun提供')));
 		
         $upyunuser = new Typecho_Widget_Helper_Form_Element_Text('upyunuser', NULL, NULL, _t('操作员：'));
 		$upyunuser->input->setAttribute('class','mini');
@@ -96,18 +100,11 @@ class UpyunFile_Plugin implements Typecho_Plugin_Interface
         if (empty($file['name'])) {
             return false;
         }
-
-        $fileName = preg_split("(\/|\\|:)", $file['name']);
-        $file['name'] = array_pop($fileName);
         
         //获取扩展名
-        $ext = '';
-        $part = explode('.', $file['name']);
-        if (($length = count($part)) > 1) {
-            $ext = strtolower($part[$length - 1]);
-        }
+        $ext = self::getSafeName($file['name']);
 
-        if (!Widget_Upload::checkFileType($ext)) {
+        if (!Widget_Upload::checkFileType($ext) || Typecho_Common::isAppEngine()) {
             return false;
         }
 
@@ -119,7 +116,7 @@ class UpyunFile_Plugin implements Typecho_Plugin_Interface
         $settings = $options->plugin('UpyunFile');
 		
 		if($settings->mode == 'typecho'){
-			$path = '/usr/uploads' . $path;
+			$path = self::getUploadDir() . $path;
 		}
 		
         //获取文件名及文件路径
@@ -127,13 +124,14 @@ class UpyunFile_Plugin implements Typecho_Plugin_Interface
 		$path = $path . '/' . $fileName;
 		
 		$uploadfile = isset($file['tmp_name']) ? $file['tmp_name'] : (isset($file['bits']) ? $file['bits'] : FALSE);	
+		
 		if ($uploadfile == FALSE) {	
 			return false;	
 		}
 		else{
 			//上传文件
 			$upyun = self::upyunInit();
-			$fh = fopen($uploadfile , 'r');
+			$fh = fopen($uploadfile , 'rb');
 			$upyun->writeFile($path, $fh ,TRUE);
 			fclose($fh);
 		}
@@ -166,18 +164,11 @@ class UpyunFile_Plugin implements Typecho_Plugin_Interface
         if (empty($file['name'])) {
             return false;
         }
-
-        $fileName = preg_split("(\/|\\|:)", $file['name']);
-        $file['name'] = array_pop($fileName);
         
         //获取扩展名
-        $ext = '';
-        $part = explode('.', $file['name']);
-        if (($length = count($part)) > 1) {
-            $ext = strtolower($part[$length - 1]);
-        }
+        $ext = self::getSafeName($file['name']);
 
-        if ($content['attachment']->type != $ext) {
+        if ($content['attachment']->type != $ext || Typecho_Common::isAppEngine()) {
             return false;
         }
 
@@ -191,7 +182,7 @@ class UpyunFile_Plugin implements Typecho_Plugin_Interface
 		else{
 			//修改文件
 			$upyun = self::upyunInit();
-			$fh = fopen($uploadfile , 'r');
+			$fh = fopen($uploadfile , 'rb');
 			$upyun->writeFile($path, $fh ,TRUE);
 			fclose($fh);
 		}
@@ -264,6 +255,7 @@ class UpyunFile_Plugin implements Typecho_Plugin_Interface
 		$host = Typecho_Request::getInstance()->upyunhost;
 		$user = Typecho_Request::getInstance()->upyunuser;
 		$pwd = Typecho_Request::getInstance()->upyunpwd;
+		
 		$hostUsage = 0;
 		
 		try{
@@ -290,4 +282,39 @@ class UpyunFile_Plugin implements Typecho_Plugin_Interface
         require_once 'SDK/upyun.class.php';
         return new UpYun($options->upyunhost, $options->upyunuser, $options->upyunpwd);
     }
+	
+     /**
+     * 获取安全的文件名 
+     * 
+     * @param string $name 
+     * @static
+     * @access private
+     * @return string
+     */
+	private static function getSafeName(&$name)
+	{
+		$name = str_replace(array('"', '<', '>'), '', $name);
+        $name = str_replace('\\', '/', $name);
+        $name = false === strpos($name, '/') ? ('a' . $name) : str_replace('/', '/a', $name);
+        $info = pathinfo($name);
+        $name = substr($info['basename'], 1);
+    
+        return isset($info['extension']) ? strtolower($info['extension']) : '';
+	}
+	
+	/**
+	*获取文件上传目录
+	* @access private
+    * @return string
+	*/
+	private static function getUploadDir()
+	{
+		if(defined('__TYPECHO_UPLOAD_DIR__'))
+		{
+			return __TYPECHO_UPLOAD_DIR__;
+		}
+		else{
+			return self::UPLOAD_DIR;
+		}
+	}
 }
