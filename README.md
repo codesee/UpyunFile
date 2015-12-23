@@ -5,7 +5,7 @@ UpyunFile
 
 ####插件简介：
 
-  基于Typecho 0.9原上传接口开发，继承原上传所有（上传、修改和删除）功能，有效分流网站流量，减轻系统负载。([更多...](http://pengzhiyong.com/development/typecho-plugin-upyunfile.html "UpyunFile详情介绍"))
+  基于Typecho 0.9（目前已支持Typecho1.0）原上传接口开发，继承原上传所有（上传、修改和删除）功能，有效分流网站流量，减轻系统负载。([更多...](http://pengzhiyong.com/development/typecho-plugin-upyunfile.html "UpyunFile详情介绍"))
   
 ####插件功能：
 
@@ -29,6 +29,7 @@ UpyunFile
 ####更新记录：
 
 **2014-01-19：**添加目录结构模式，使用者可根据需要选择喜好的模式。
+**2015-12-24：**升级插件，以支持Typecho 1.0
 
 ####联系作者：
 
