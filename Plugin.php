@@ -14,7 +14,7 @@ class UpyunFile_Plugin implements Typecho_Plugin_Interface
 	//上传文件目录
 	const UPLOAD_DIR = '/usr/uploads' ;
 	
-    /**
+     /**
      * 激活插件方法,如果激活失败,直接抛出异常
      * 
      * @access public
@@ -39,9 +39,10 @@ class UpyunFile_Plugin implements Typecho_Plugin_Interface
      * @return void
      * @throws Typecho_Plugin_Exception
      */
-    public static function deactivate(){
+    public static function deactivate()
+    {
 		return _t('插件已被禁用');
-	}
+    }
     
     /**
      * 获取插件配置面板
@@ -250,25 +251,25 @@ class UpyunFile_Plugin implements Typecho_Plugin_Interface
      * 
      * @return boolean
      */
-	public static function validate()
-	{
-		$host = Typecho_Request::getInstance()->upyunhost;
-		$user = Typecho_Request::getInstance()->upyunuser;
-		$pwd = Typecho_Request::getInstance()->upyunpwd;
-		
-		$hostUsage = 0;
-		
-		try{
-			require_once 'SDK/upyun.class.php';
-			$upyun = new UpYun($host, $user, $pwd);
-			$hostUsage = (int)$upyun->getFolderUsage('/');
-		}
-		catch(Exception $e){
-			$hostUsage = -1;
-		}
-		
-		return $hostUsage >= 0;
+     public static function validate()
+     {
+	$host = Typecho_Request::getInstance()->upyunhost;
+	$user = Typecho_Request::getInstance()->upyunuser;
+	$pwd = Typecho_Request::getInstance()->upyunpwd;
+	
+	$hostUsage = 0;
+	
+	try{
+		require_once 'SDK/upyun.class.php';
+		$upyun = new UpYun($host, $user, $pwd);
+		$hostUsage = (int)$upyun->getFolderUsage('/');
 	}
+	catch(Exception $e){
+		$hostUsage = -1;
+	}
+	
+	return $hostUsage >= 0;
+     }
 	
     /**
      * Upyun初始化
@@ -291,30 +292,30 @@ class UpyunFile_Plugin implements Typecho_Plugin_Interface
      * @access private
      * @return string
      */
-	private static function getSafeName(&$name)
-	{
-		$name = str_replace(array('"', '<', '>'), '', $name);
-        $name = str_replace('\\', '/', $name);
-        $name = false === strpos($name, '/') ? ('a' . $name) : str_replace('/', '/a', $name);
-        $info = pathinfo($name);
-        $name = substr($info['basename'], 1);
-    
-        return isset($info['extension']) ? strtolower($info['extension']) : '';
-	}
-	
+     private static function getSafeName(&$name)
+     {
+	$name = str_replace(array('"', '<', '>'), '', $name);
+	$name = str_replace('\\', '/', $name);
+	$name = false === strpos($name, '/') ? ('a' . $name) : str_replace('/', '/a', $name);
+	$info = pathinfo($name);
+	$name = substr($info['basename'], 1);
+
+	return isset($info['extension']) ? strtolower($info['extension']) : '';
+      }
+
 	/**
 	*获取文件上传目录
 	* @access private
-    * @return string
+	* @return string
 	*/
-	private static function getUploadDir()
+      private static function getUploadDir()
+      {
+	if(defined('__TYPECHO_UPLOAD_DIR__'))
 	{
-		if(defined('__TYPECHO_UPLOAD_DIR__'))
-		{
-			return __TYPECHO_UPLOAD_DIR__;
-		}
-		else{
-			return self::UPLOAD_DIR;
-		}
+		return __TYPECHO_UPLOAD_DIR__;
 	}
+	else{
+		return self::UPLOAD_DIR;
+	}
+     }
 }
